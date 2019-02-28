@@ -6,40 +6,25 @@ import sys
 # import cardlib as pc
 
 
-class MyWindow(QGroupBox):
+class MainWindow(QGroupBox):
     def __init__(self):
-        super().__init__("My window content")  # Call the QWidget initialization as well!
+        super().__init__("Main window")  # Call the QWidget initialization as well!
 
-        betButton = QPushButton("Bet")
-        foldButton = QPushButton("Fold")
-        flopCard1 = QLabel("Card 1")
-        flopCard2 = QLabel("Card 2")
-        flopCard3 = QLabel("Card 3")
-        turnCard = QLabel("Turn")
-        riverCard = QLabel("River")
+        # creates widgets
+        cv = ControlView()
+        pv1 = PlayerView()
+        pv2 = PlayerView()
+        tv = TableView()
 
-        # Bet and fold button
+        # add horizontal widgets
         hbox = QHBoxLayout()
-        hbox.addStretch(1)
-        # add widgets
-        hbox.addWidget(betButton)
-        hbox.addWidget(foldButton)
-        # Flop, turn, river cards
-        hbox1 = QHBoxLayout()
-        hbox1.addStretch(1)
-
-        #add widgets
-        boardCards = QGroupBox("board cards")
-        hbox1.addWidget(flopCard1)
-        hbox1.addWidget(flopCard2)
-        hbox1.addWidget(flopCard3)
-        hbox1.addWidget(turnCard)
-        hbox1.addWidget(riverCard)
-
-        # Arrange vertical
+        hbox.addWidget(pv1)
+        hbox.addWidget(pv2)
+        hbox.addWidget(cv)
+        # add vertical widgets
         vbox = QVBoxLayout()
         vbox.addStretch(1)
-        vbox.addLayout(hbox1)
+        vbox.addWidget(tv)
         vbox.addLayout(hbox)
 
         self.setLayout(vbox)
@@ -48,8 +33,74 @@ class MyWindow(QGroupBox):
         self.setWindowTitle('Poker Game')
 
 
+class ControlView(QGroupBox):
+    def __init__(self):
+        super().__init__("Control View")  # Call the QWidget initialization as well!
+
+        #Create buttons
+        betButton = QPushButton("Bet")
+        foldButton = QPushButton("Fold")
+        raiseButton = QPushButton("Raise")
+        checkButton = QPushButton("Check")
+        betAmmount = QLineEdit()
+
+        # arrange widgets vertically
+        vbox = QVBoxLayout()
+        vbox.addStretch(1)
+        # add widgets
+        vbox.addWidget(betAmmount)
+        vbox.addWidget(betButton)
+        vbox.addWidget(foldButton)
+        vbox.addWidget(raiseButton)
+        vbox.addWidget(checkButton)
+
+        # Arrange horizontally
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addLayout(vbox)
+
+        self.setLayout(hbox)
+
+
+class PlayerView(QGroupBox):
+    def __init__(self):
+        super().__init__("Player 1")  # Call the QWidget initialization as well!
+
+        # widgets
+        valueLabel = QLabel("Value")
+        cardView = QLabel("Two Cards")
+        # arrange vertically
+        vbox = QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addWidget(valueLabel)
+        vbox.addWidget(cardView)
+        # arrange horizontally
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addLayout(vbox)
+
+        self.setLayout(hbox)
+
+
+class TableView(QGroupBox):
+    def __init__(self):
+        super().__init__("Table View")
+
+        cardLabels = QLabel("Flop, River, Turn")
+
+        hbox = QHBoxLayout()
+        hbox.addStretch(1)
+        hbox.addWidget(cardLabels)
+
+        vbox = QVBoxLayout()
+        vbox.addStretch(1)
+        vbox.addLayout(hbox)
+
+        self.setLayout(vbox)
+
+
 app = QApplication(sys.argv)
-win = MyWindow()
+win = MainWindow()
 
 win.show()
 app.exec_()
