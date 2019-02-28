@@ -3,7 +3,7 @@ from PyQt5.QtGui import *
 from PyQt5.QtSvg import *
 from PyQt5.QtWidgets import *
 import sys
-# import cardlib as pc
+from cardlib import *
 
 
 class MainWindow(QGroupBox):
@@ -85,18 +85,51 @@ class PlayerView(QGroupBox):
 class TableView(QGroupBox):
     def __init__(self):
         super().__init__("Table View")
-
+        # widgets
         cardLabels = QLabel("Flop, River, Turn")
-
+        # arrange horizontally
         hbox = QHBoxLayout()
         hbox.addStretch(1)
         hbox.addWidget(cardLabels)
-
+        # arrange vertically
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         vbox.addLayout(hbox)
 
         self.setLayout(vbox)
+
+
+class GameState:
+    def __init__(self):
+        pass
+
+    def cards_on_table(self):
+        pass
+
+    def the_pot(self):
+        pass
+
+    def fold(self):
+        pass
+
+    def call(self):
+        pass
+
+    def bet(self, bet_amount):
+        pass
+
+
+class Player:
+    def __init__(self, name):
+        self.name = name
+        self.credits = 100
+        self.cards = ['Qs', 'AD', '7C']
+        self.folded = False
+
+    def active(self):
+        return self.credits > 0 and not self.folded
+
+
 
 
 app = QApplication(sys.argv)
