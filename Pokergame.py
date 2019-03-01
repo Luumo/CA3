@@ -99,32 +99,50 @@ class TableView(QGroupBox):
         self.setLayout(vbox)
 
 
-class GameState:
+class TexasHoldEm:
     def __init__(self):
+        # init players
+        self.players = ['P1', 'P2']
+        # init deck
+        self.deck = StandardDeck()
+        # init flop (3 cards)
+        self.table_cards = [self.deck.pop_card() for _ in range(3)]
+        self.pot = 0
+
+
+
+    def active_player(self):
+        # Whos turn is it?
         pass
 
     def cards_on_table(self):
+        # Which cards are on the table?
         pass
 
     def the_pot(self):
+        # add money to pot when betting, call
         pass
 
     def fold(self):
+        #
         pass
 
     def call(self):
+        # call previous players decision
         pass
 
     def bet(self, bet_amount):
+        # bet a specific ammount, add it to the pot
         pass
 
 
 class Player:
     def __init__(self, name):
         self.name = name
-        self.credits = 100
-        self.cards = ['Qs', 'AD', '7C']
+        self.credits = 1000
+        self.cards = Hand()
         self.folded = False
+
 
     def active(self):
         return self.credits > 0 and not self.folded
@@ -134,6 +152,5 @@ class Player:
 
 app = QApplication(sys.argv)
 win = MainWindow()
-
 win.show()
 app.exec_()
