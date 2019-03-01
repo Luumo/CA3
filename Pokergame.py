@@ -12,8 +12,8 @@ class MainWindow(QGroupBox):
 
         # creates widgets
         cv = ControlView()
-        pv1 = PlayerView(game.player[0])
-        pv2 = PlayerView(game.plater[1])
+        pv1 = PlayerView(game.players[0])
+        pv2 = PlayerView(game.players[1])
         tv = TableView()
 
         # add horizontal widgets
@@ -32,6 +32,13 @@ class MainWindow(QGroupBox):
         self.setGeometry(500, 300, 1000, 500)
         self.setWindowTitle('Poker Game')
 
+        # Model
+        self.game = game
+        self.update_pot()
+
+
+    def update_pot(self):
+        pass
 
 class ControlView(QGroupBox):
     def __init__(self):
@@ -63,16 +70,17 @@ class ControlView(QGroupBox):
 
 
 class PlayerView(QGroupBox):
-    def __init__(self):
-        super().__init__("Player 1")
+    def __init__(self, player):
+        super().__init__()
 
+        self.player = player
         # widgets
-        valueLabel = QLabel("Credits")
+        self.valueLabel = QLabel()
         cardView = QLabel("Two Cards")
         # arrange vertically
         vbox = QVBoxLayout()
         vbox.addStretch(1)
-        vbox.addWidget(valueLabel)
+        vbox.addWidget(self.valueLabel)
         vbox.addWidget(cardView)
         # arrange horizontally
         hbox = QHBoxLayout()
@@ -81,7 +89,10 @@ class PlayerView(QGroupBox):
 
         self.setLayout(hbox)
 
+        self.update_credits()
 
+    def update_credits(self):
+        self.valueLabel.setText("Credits: ${}".format(self.player.credits))
 
 
 class TableView(QGroupBox):
@@ -159,6 +170,6 @@ class Player:
 
 
 app = QApplication(sys.argv)
-win = MainWindow()
+win = MainWindow(TexasHoldEm())
 win.show()
 app.exec_()
