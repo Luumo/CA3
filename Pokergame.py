@@ -132,8 +132,7 @@ class TexasHoldEm(QObject):
         self.pot = 0
 
     def active_player(self):
-        # Whos turn is it?
-        pass
+        return self.players[0]
 
     def cards_on_table(self):
         # Which cards are on the table?
@@ -143,7 +142,7 @@ class TexasHoldEm(QObject):
         pass
 
     def fold(self):
-        # throw away active players cards, other player wins
+        # if active player press fold, then other player win!
         pass
 
     def call(self):
