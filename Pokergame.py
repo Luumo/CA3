@@ -7,13 +7,13 @@ from cardlib import *
 
 
 class MainWindow(QGroupBox):
-    def __init__(self):
+    def __init__(self, game):
         super().__init__("Main window")  # Call the QWidget initialization as well!
 
         # creates widgets
         cv = ControlView()
-        pv1 = PlayerView()
-        pv2 = PlayerView()
+        pv1 = PlayerView(game.player[0])
+        pv2 = PlayerView(game.plater[1])
         tv = TableView()
 
         # add horizontal widgets
@@ -64,10 +64,10 @@ class ControlView(QGroupBox):
 
 class PlayerView(QGroupBox):
     def __init__(self):
-        super().__init__("Player 1")  # Call the QWidget initialization as well!
+        super().__init__("Player 1")
 
         # widgets
-        valueLabel = QLabel("Value")
+        valueLabel = QLabel("Credits")
         cardView = QLabel("Two Cards")
         # arrange vertically
         vbox = QVBoxLayout()
@@ -80,6 +80,8 @@ class PlayerView(QGroupBox):
         hbox.addLayout(vbox)
 
         self.setLayout(hbox)
+
+
 
 
 class TableView(QGroupBox):
@@ -99,17 +101,19 @@ class TableView(QGroupBox):
         self.setLayout(vbox)
 
 
-class TexasHoldEm:
+class TexasHoldEm(QObject):
+
+    new_pot = pyqtSignal()
+
     def __init__(self):
-        # init players
-        self.players = ['P1', 'P2']
+        super().__init__()
+        # init players, should be represented by player class ?
+        self.players = [Player("Janne"), Player("Fia")]
         # init deck
         self.deck = StandardDeck()
         # init flop (3 cards)
         self.table_cards = [self.deck.pop_card() for _ in range(3)]
         self.pot = 0
-
-
 
     def active_player(self):
         # Whos turn is it?
@@ -120,32 +124,36 @@ class TexasHoldEm:
         pass
 
     def the_pot(self):
-        # add money to pot when betting, call
         pass
 
     def fold(self):
-        #
+        # throw away active players cards, other player wins
         pass
 
     def call(self):
         # call previous players decision
         pass
 
-    def bet(self, bet_amount):
-        # bet a specific ammount, add it to the pot
-        pass
+    def bet(self, amount):
+        self.active_player().bet(amount)
+        self.pot += amount
+        self.new_pot.emit()
 
 
 class Player:
-    def __init__(self, name):
+    new_credits = pyqtSignal()
+
+    def __init__(self, name: str):
         self.name = name
         self.credits = 1000
-        self.cards = Hand()
-        self.folded = False
-
+        self.hand = Hand()
 
     def active(self):
-        return self.credits > 0 and not self.folded
+        return self.credits > 0
+
+    def bet(self, amount):
+        self.credits -= amount
+        self.new_credits.emit()
 
 
 
