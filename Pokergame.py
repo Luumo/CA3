@@ -11,7 +11,7 @@ class MainWindow(QGroupBox):
         super().__init__("Main window")  # Call the QWidget initialization as well!
 
         # creates widgets
-        cv = ControlView()
+        cv = ControlView(game.pot)
         pv1 = PlayerView(game.players[0])
         pv2 = PlayerView(game.players[1])
         tv = TableView()
@@ -41,20 +41,22 @@ class MainWindow(QGroupBox):
         pass
 
 class ControlView(QGroupBox):
-    def __init__(self):
+    def __init__(self, pot):
         super().__init__("Control View")  # Call the QWidget initialization as well!
-
+        self.pot = pot
         #Create buttons
         betButton = QPushButton("Bet")
         foldButton = QPushButton("Fold")
         raiseButton = QPushButton("Raise")
         checkButton = QPushButton("Check")
         betAmmount = QLineEdit()
+        self.potLabel = QLabel()
 
         # arrange widgets vertically
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         # add widgets
+        vbox.addWidget(self.potLabel)
         vbox.addWidget(betAmmount)
         vbox.addWidget(betButton)
         vbox.addWidget(foldButton)
@@ -68,11 +70,15 @@ class ControlView(QGroupBox):
 
         self.setLayout(hbox)
 
+        self.update_pot()
+
+    def update_pot(self):
+            self.potLabel.setText("Pot: ${}".format(self.pot))
+
 
 class PlayerView(QGroupBox):
     def __init__(self, player):
         super().__init__()
-
         self.player = player
         # widgets
         self.valueLabel = QLabel()
@@ -88,7 +94,7 @@ class PlayerView(QGroupBox):
         hbox.addLayout(vbox)
 
         self.setLayout(hbox)
-
+        # Model
         self.update_credits()
 
     def update_credits(self):
@@ -113,7 +119,6 @@ class TableView(QGroupBox):
 
 
 class TexasHoldEm(QObject):
-
     new_pot = pyqtSignal()
 
     def __init__(self):
