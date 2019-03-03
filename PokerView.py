@@ -29,7 +29,6 @@ class TexasHoldEm(QObject):
         elif self.active_player() == self.players[1]:
             self.winner.emit(self.players[0].name + " won!")
 
-
     def call(self):
         # call previous players decision
         pass
@@ -40,10 +39,11 @@ class TexasHoldEm(QObject):
         self.new_pot.emit()
 
 
-class Player:
+class Player(QObject):
     new_credits = pyqtSignal()
 
     def __init__(self, name: str):
+        super().__init__()
         self.name = name
         self.credits = 1000
         self.hand = Hand()

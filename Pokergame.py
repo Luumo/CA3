@@ -49,7 +49,8 @@ class ControlView(QGroupBox):
         self.pot = game.pot
         #Create buttons
         betButton = QPushButton("Bet")
-        betAmmount = QLineEdit()
+        self.betAmmount = QLineEdit()
+        # betButton.clicked.connect()
         foldButton = QPushButton("Fold")
         foldButton.clicked.connect(game.fold)
         raiseButton = QPushButton("Raise")
@@ -61,7 +62,7 @@ class ControlView(QGroupBox):
         vbox.addStretch(1)
         # add widgets
         vbox.addWidget(self.potLabel)
-        vbox.addWidget(betAmmount)
+        vbox.addWidget(self.betAmmount)
         vbox.addWidget(betButton)
         vbox.addWidget(foldButton)
         vbox.addWidget(raiseButton)
@@ -79,6 +80,9 @@ class ControlView(QGroupBox):
     def update_pot(self):
             self.potLabel.setText("Pot: ${}".format(self.pot))
 
+    # def bet_ammount(self, game):
+    #     ammount = self.betAmmount.text()
+    #     return game.bet(ammount)
 
 
 class PlayerView(QGroupBox):
