@@ -38,12 +38,18 @@ class TexasHoldEm(QObject):
 
 class Player(QObject):
     new_credits = pyqtSignal()
+    data_changed = pyqtSignal()
 
     def __init__(self, name: str):
         super().__init__()
         self.name = name
         self.credits = 1000
         self.hand = Hand()
+        self.inplay = False
+
+    def set_inplay(self, inplay):
+        self.inplay = inplay
+        self.data_changed.emit()
 
     def active(self):
         return self.credits > 0
