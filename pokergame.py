@@ -1,5 +1,6 @@
 from PyQt5.QtCore import *
 from cardlib import *
+from gameview import *
 
 class TexasHoldEm(QObject):
     new_pot = pyqtSignal()
@@ -33,7 +34,7 @@ class TexasHoldEm(QObject):
         # call previous players decision
         pass
 
-    def bet(self, amount):
+    def bet(self, amount: int):
         self.active_player().bet(amount)
         self.pot += amount
         self.new_pot.emit()
@@ -51,7 +52,12 @@ class Player(QObject):
     def active(self):
         return self.credits > 0
 
-    def bet(self, amount):
+    def bet(self, amount: int):
         self.credits -= amount
         self.new_credits.emit()
 
+
+app = QApplication(sys.argv)
+win = MainWindow(TexasHoldEm())
+win.show()
+app.exec_()
