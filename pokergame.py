@@ -10,10 +10,6 @@ class TexasHoldEm(QObject):
         super().__init__()
         # init players, should be represented by player class ?
         self.players = [Player("Janne"), Player("Fia")]
-        # init deck
-        self.deck = StandardDeck()
-        # init flop (3 cards)
-        self.table_cards = [self.deck.pop_card() for _ in range(3)]
         self.pot = 0
 
     def active_player(self):

@@ -1,0 +1,4 @@
+        # init deck
+        self.deck = StandardDeck()
+        # init flop (3 cards)
+        self.table_cards = [self.deck.pop_card() for _ in range(3)]

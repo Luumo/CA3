@@ -7,7 +7,7 @@ import sys
 
 class MainWindow(QGroupBox):
     def __init__(self, game):
-        super().__init__("Main window")  # Call the QWidget initialization as well!
+        super().__init__("Main window")
 
         # creates widgets
         cv = ControlView(game)
@@ -44,11 +44,13 @@ class MainWindow(QGroupBox):
 class ControlView(QGroupBox):
     def __init__(self, game):
         super().__init__("Control View")
-        self.pot = game.pot
-        #Create buttons
-        betButton = QPushButton("Bet")
+        self.game = game
+
+        #widgets
+        self.betButton = QPushButton("Bet")
         self.betAmmount = QLineEdit()
-        # betButton.clicked.connect()
+        self.betButton.clicked.connect(self.bet_ammount)
+
         foldButton = QPushButton("Fold")
         foldButton.clicked.connect(game.fold)
         raiseButton = QPushButton("Raise")
@@ -61,7 +63,7 @@ class ControlView(QGroupBox):
         # add widgets
         vbox.addWidget(self.potLabel)
         vbox.addWidget(self.betAmmount)
-        vbox.addWidget(betButton)
+        vbox.addWidget(self.betButton)
         vbox.addWidget(foldButton)
         vbox.addWidget(raiseButton)
         vbox.addWidget(checkButton)
@@ -73,14 +75,14 @@ class ControlView(QGroupBox):
 
         self.setLayout(hbox)
 
+        game.new_pot.connect(self.update_pot)
         self.update_pot()
 
     def update_pot(self):
-            self.potLabel.setText("Pot: ${}".format(self.pot))
+        self.potLabel.setText("Pot: ${}".format(self.game.pot))
 
-    # def bet_ammount(self, game):
-    #     ammount = self.betAmmount.text()
-    #     return game.bet(ammount)
+    def bet_ammount(self):
+        self.game.bet(int(self.betAmmount.text()))
 
 
 class PlayerView(QGroupBox):
@@ -89,13 +91,13 @@ class PlayerView(QGroupBox):
         self.player = player
 
         # widgets
-        self.valueLabel = QLabel()
+        self.creditLabel = QLabel()
         cardView = QLabel("Two Cards")
 
         # arrange vertically
         vbox = QVBoxLayout()
         vbox.addStretch(1)
-        vbox.addWidget(self.valueLabel)
+        vbox.addWidget(self.creditLabel)
         vbox.addWidget(cardView)
 
         # arrange horizontally
@@ -106,10 +108,11 @@ class PlayerView(QGroupBox):
         self.setLayout(hbox)
 
         # Model
+        player.new_credits.connect(self.update_credits)
         self.update_credits()
 
     def update_credits(self):
-        self.valueLabel.setText("Credits: ${}".format(self.player.credits))
+        self.creditLabel.setText("Credits: ${}".format(self.player.credits))
 
 
 class TableView(QGroupBox):
