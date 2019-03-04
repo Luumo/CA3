@@ -1,7 +1,6 @@
 from PyQt5.QtGui import *
 from PyQt5.QtSvg import *
 from PyQt5.QtWidgets import *
-import sys
 
 
 class TableScene(QGraphicsScene):
@@ -99,12 +98,16 @@ class ControlView(QGroupBox):
 
         self.setLayout(hbox)
 
-        game.data_changed.connect(self.update)
+        game.new_pot.connect(self.update_pot)
+        game.next_player.connect(self.update_pot)
         self.update()
+        self.update_active_player()
 
-    def update(self):
+    def update_pot(self):
         # update pot label
         self.potLabel.setText("Pot: ${}".format(self.game.pot))
+
+    def update_active_player(self):
         # update active player label
         self.ActivePlayerLabel.setText("Active Player: {}".format(self.game.active_player().name))
 
@@ -135,7 +138,7 @@ class PlayerView(QGroupBox):
         self.setLayout(hbox)
 
         # Model
-        player.data_changed.connect(self.update_credits)
+        player.new_credits.connect(self.update_credits)
         self.update_credits()
 
     def update_credits(self):
