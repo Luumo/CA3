@@ -3,17 +3,29 @@ from cardlib import *
 from gameview import *
 
 class TexasHoldEm(QObject):
-    new_pot = pyqtSignal()
+    data_changed = pyqtSignal()
     winner = pyqtSignal(str,)
 
     def __init__(self):
         super().__init__()
-        # init players, should be represented by player class ?
+        # init players
         self.players = [Player("Janne"), Player("Fia")]
+        # Data which will be changed while game is running
         self.pot = 0
+        self.recent_bet = 0
+        self.player_turn = 0
+        self.players[self.player_turn].set_inplay(True)
 
     def active_player(self):
-        return self.players[0]
+        # returns the active player
+        return self.players[self.player_turn]
+
+    def change_active_player(self):
+        # Changes active player
+        self.players[self.player_turn].set_inplay(False)
+        self.player_turn = (self.player_turn + 1) % len(self.players)
+        self.players[self.player_turn].set_inplay(True)
+        self.data_changed.emit()
 
     def cards_on_table(self):
         # Which cards are on the table?
@@ -27,13 +39,16 @@ class TexasHoldEm(QObject):
             self.winner.emit(self.players[0].name + " won!")
 
     def call(self):
-        # call previous players decision
+        # pay same ammount of credits as recent player, and keep playing
+        self.bet(self.recent_bet)
         pass
 
     def bet(self, amount: int):
         self.active_player().bet(amount)
         self.pot += amount
-        self.new_pot.emit()
+        self.recent_bet = amount
+        self.data_changed.emit()
+        self.change_active_player()
 
 
 class Player(QObject):

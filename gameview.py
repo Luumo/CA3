@@ -41,19 +41,22 @@ class MainWindow(QGroupBox):
         msg.exec()
 
 
+
 class ControlView(QGroupBox):
     def __init__(self, game):
         super().__init__("Control View")
         self.game = game
 
         #widgets
+        self.ActivePlayerLabel = QLabel()
         self.betButton = QPushButton("Bet")
         self.betAmmount = QLineEdit()
         self.betButton.clicked.connect(self.bet_ammount)
 
         foldButton = QPushButton("Fold")
         foldButton.clicked.connect(game.fold)
-        raiseButton = QPushButton("Raise")
+        self.callButton = QPushButton("Call")
+        self.callButton.clicked.connect(game.call)
         checkButton = QPushButton("Check")
         self.potLabel = QLabel()
 
@@ -61,11 +64,12 @@ class ControlView(QGroupBox):
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         # add widgets
+        vbox.addWidget(self.ActivePlayerLabel)
         vbox.addWidget(self.potLabel)
         vbox.addWidget(self.betAmmount)
         vbox.addWidget(self.betButton)
+        vbox.addWidget(self.callButton)
         vbox.addWidget(foldButton)
-        vbox.addWidget(raiseButton)
         vbox.addWidget(checkButton)
 
         # Arrange horizontally
@@ -75,11 +79,14 @@ class ControlView(QGroupBox):
 
         self.setLayout(hbox)
 
-        game.new_pot.connect(self.update_pot)
-        self.update_pot()
+        game.data_changed.connect(self.update)
+        self.update()
 
-    def update_pot(self):
+    def update(self):
+        # update pot label
         self.potLabel.setText("Pot: ${}".format(self.game.pot))
+        # update active player label
+        self.ActivePlayerLabel.setText("Active Player: {}".format(self.game.active_player().name))
 
     def bet_ammount(self):
         self.game.bet(int(self.betAmmount.text()))
