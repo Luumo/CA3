@@ -4,6 +4,21 @@ from PyQt5.QtWidgets import *
 import sys
 
 
+class TableScene(QGraphicsScene):
+    """ A scene with a table cloth background """
+    def __init__(self):
+        super().__init__()
+        self.tile = QPixmap('cards/table.png')
+        self.setBackgroundBrush(QBrush(self.tile))
+
+
+class CardSvgItem(QGraphicsSvgItem):
+    """ A simple overloaded QGraphicsSvgItem that also stores the card position """
+    def __init__(self, renderer, id):
+        super().__init__()
+        self.setSharedRenderer(renderer)
+        self.position = id
+
 
 class MainWindow(QGroupBox):
     def __init__(self, game):
@@ -49,15 +64,20 @@ class ControlView(QGroupBox):
 
         #widgets
         self.ActivePlayerLabel = QLabel()
+
         self.betButton = QPushButton("Bet")
         self.betAmmount = QLineEdit()
         self.betButton.clicked.connect(self.bet_ammount)
 
-        foldButton = QPushButton("Fold")
-        foldButton.clicked.connect(game.fold)
+        self.foldButton = QPushButton("Fold")
+        self.foldButton.clicked.connect(game.fold)
+
         self.callButton = QPushButton("Call")
         self.callButton.clicked.connect(game.call)
-        checkButton = QPushButton("Check")
+
+        self.checkButton = QPushButton("Check")
+        self.checkButton.clicked.connect(game.check)
+
         self.potLabel = QLabel()
 
         # arrange widgets vertically
@@ -69,8 +89,8 @@ class ControlView(QGroupBox):
         vbox.addWidget(self.betAmmount)
         vbox.addWidget(self.betButton)
         vbox.addWidget(self.callButton)
-        vbox.addWidget(foldButton)
-        vbox.addWidget(checkButton)
+        vbox.addWidget(self.foldButton)
+        vbox.addWidget(self.checkButton)
 
         # Arrange horizontally
         hbox = QHBoxLayout()
@@ -115,7 +135,7 @@ class PlayerView(QGroupBox):
         self.setLayout(hbox)
 
         # Model
-        player.new_credits.connect(self.update_credits)
+        player.data_changed.connect(self.update_credits)
         self.update_credits()
 
     def update_credits(self):

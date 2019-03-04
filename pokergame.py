@@ -27,10 +27,6 @@ class TexasHoldEm(QObject):
         self.players[self.player_turn].set_inplay(True)
         self.data_changed.emit()
 
-    def cards_on_table(self):
-        # Which cards are on the table?
-        pass
-
     def fold(self):
         # if active player folds, other player wins.
         if self.active_player() == self.players[0]:
@@ -38,10 +34,14 @@ class TexasHoldEm(QObject):
         elif self.active_player() == self.players[1]:
             self.winner.emit(self.players[0].name + " won!")
 
+    def check(self):
+        # TODO: only allow check when noone have betted. else warn to do something else
+        self.change_active_player()
+        self.data_changed.emit()
+
     def call(self):
         # pay same ammount of credits as recent player, and keep playing
         self.bet(self.recent_bet)
-        pass
 
     def bet(self, amount: int):
         self.active_player().bet(amount)
@@ -50,9 +50,12 @@ class TexasHoldEm(QObject):
         self.data_changed.emit()
         self.change_active_player()
 
+    def cards_on_table(self):
+        # Which cards are on the table?
+        pass
+
 
 class Player(QObject):
-    new_credits = pyqtSignal()
     data_changed = pyqtSignal()
 
     def __init__(self, name: str):
@@ -71,7 +74,7 @@ class Player(QObject):
 
     def bet(self, amount: int):
         self.credits -= amount
-        self.new_credits.emit()
+        self.data_changed.emit()
 
 
 app = QApplication(sys.argv)
