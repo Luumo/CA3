@@ -11,13 +11,20 @@ class TexasHoldEm(QObject):
 
     def __init__(self):
         super().__init__()
+        #init deck
+
         # init players
         self.players = [Player("Janne"), Player("Fia")]
         # Data which will be changed while game is running
         self.pot = 0
         self.recent_bet = 0
         self.player_turn = 0
-        self.players[self.player_turn].set_inplay(True)
+        self.deck = None
+        self.next_round()
+
+    def start(self):
+        pass
+
 
     def active_player(self):
         # returns the active player
@@ -55,11 +62,15 @@ class TexasHoldEm(QObject):
 
     def next_round(self):
         #  wipe cards, deck, pot
-        # self.deck = StandardDeck()
-        # self.pot = 0
-        # activate player
-        # self.new_active_player.emit()
-        pass
+        self.deck = StandardDeck()
+        self.deck.shuffle_deck()
+        self.pot = 0
+        for player in self.players:
+            player.hand.clear()
+            for _ in range(2):
+                player.hand.add_card(self.deck.pop_card())
+        self.players[self.player_turn].set_inplay(True)
+        self.next_player.emit()
 
     def cards_on_table(self):
         # Which cards are on the table?
@@ -73,7 +84,7 @@ class Player(QObject):
         super().__init__()
         self.name = name
         self.credits = 1000
-        self.hand = Hand()
+        self.hand = HandModel()
         self.inplay = False
 
     def set_inplay(self, inplay):
@@ -87,39 +98,74 @@ class Player(QObject):
         self.credits -= amount
         self.new_credits.emit()
 
-class HandModel(Hand, QObject):
-    data_changed = pyqtSignal()
 
+# You have made a class similar to this (hopefully):
+class CardModel(QObject):
+    new_cards = pyqtSignal()
+
+    @abstractmethod
+    def __iter__(self):
+        pass
+
+    @abstractmethod
+    def flip(self):
+        pass
+
+    @abstractmethod
+    def flipped(self, i):
+        pass
+
+
+class TableModel(CardModel):
+    def __init__(self):
+        super().__init__()
+        self.cards = []
+
+    def __iter__(self):
+        return iter(self.cards)
+
+    def flip(self):
+        pass
+
+    def flipped(self, i):
+        return False
+
+    def add_card(self, card):
+        self.cards.append(card)
+        self.new_cards.emit()
+
+    def clear(self):
+        self.cards = []
+        self.new_cards.emit()
+
+
+class HandModel(Hand, CardModel):
     def __init__(self):
         Hand.__init__(self)
-        QObject.__init__(self)
-
+        CardModel.__init__(self)
         # Additional state needed by the UI, keeping track of the selected cards:
-        self.marked_cards = [False]*len(self.cards)
         self.flipped_cards = True
+
+    def __iter__(self):
+        return iter(self.cards)
 
     def flip(self):
         # Flips over the cards (to hide them)
         self.flipped_cards = not self.flipped_cards
-        self.data_changed.emit()
-
-    def marked(self, i):
-        return self.marked_cards[i]
+        self.new_cards.emit()
 
     def flipped(self, i):
         # This model only flips all or no cards, so we don't care about the index.
         # Might be different for other games though!
         return self.flipped_cards
 
-    def clicked_position(self, i):
-        # Mark the card as position "i" to be thrown away
-        self.marked_cards[i] = not self.marked_cards[i]
-        self.data_changed.emit()
-
     def add_card(self, card):
         super().add_card(card)
-        self.data_changed.emit()
+        self.new_cards.emit()
 
+    def clear(self):
+        self.cards = []
+        self.new_cards.emit()
 
 # pokergame.py
 app = QApplication(sys.argv)
