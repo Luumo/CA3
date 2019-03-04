@@ -2,6 +2,7 @@ from PyQt5.QtCore import *
 from cardlib import *
 from gameview import *
 
+# pokermodel.py
 class TexasHoldEm(QObject):
     data_changed = pyqtSignal()
     winner = pyqtSignal(str,)
@@ -50,6 +51,14 @@ class TexasHoldEm(QObject):
         self.data_changed.emit()
         self.change_active_player()
 
+    def next_round(self):
+        #  wipe cards, deck, pot
+        # self.deck = StandardDeck()
+        # self.pot = 0
+        # activate player
+        # self.new_active_player.emit()
+        pass
+
     def cards_on_table(self):
         # Which cards are on the table?
         pass
@@ -76,7 +85,7 @@ class Player(QObject):
         self.credits -= amount
         self.data_changed.emit()
 
-
+# pokergame.py
 app = QApplication(sys.argv)
 win = MainWindow(TexasHoldEm())
 win.show()
