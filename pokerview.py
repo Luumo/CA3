@@ -4,22 +4,6 @@ from PyQt5.QtWidgets import *
 import cardlib
 
 
-class TableScene(QGraphicsScene):
-    """ A scene with a table cloth background """
-    def __init__(self):
-        super().__init__()
-        self.tile = QPixmap('cards/table.png')
-        self.setBackgroundBrush(QBrush(self.tile))
-
-
-class CardSvgItem(QGraphicsSvgItem):
-    """ A simple overloaded QGraphicsSvgItem that also stores the card position """
-    def __init__(self, renderer, id):
-        super().__init__()
-        self.setSharedRenderer(renderer)
-        self.position = id
-
-
 class MainWindow(QGroupBox):
     def __init__(self, game):
         super().__init__("Main window")
@@ -27,8 +11,7 @@ class MainWindow(QGroupBox):
         # creates widgets
         cv = ControlView(game)
         pvs = [PlayerView(player) for player in game.players]
-        tv = TableView()
-        # tv = TableView(game.table)
+        tv = TableView(game)
 
         # add horizontal widgets
         hbox = QHBoxLayout()
@@ -145,15 +128,15 @@ class PlayerView(QGroupBox):
 
 
 class TableView(QGroupBox):
-    def __init__(self):
+    def __init__(self, game):
         super().__init__("Table View")
         # widgets
-        cardLabels = QLabel("Flop, River, Turn")
+        self.tableView = CardView(game.table)
 
         # arrange horizontally
         hbox = QHBoxLayout()
         hbox.addStretch(1)
-        hbox.addWidget(cardLabels)
+        hbox.addWidget(self.tableView)
 
         # arrange vertically
         vbox = QVBoxLayout()
@@ -161,6 +144,14 @@ class TableView(QGroupBox):
         vbox.addLayout(hbox)
 
         self.setLayout(vbox)
+
+
+class CardSvgItem(QGraphicsSvgItem):
+    """ A simple overloaded QGraphicsSvgItem that also stores the card position """
+    def __init__(self, renderer, id):
+        super().__init__()
+        self.setSharedRenderer(renderer)
+        self.position = id
 
 
 class TableScene(QGraphicsScene):
@@ -177,6 +168,7 @@ class CardItem(QGraphicsSvgItem):
         super().__init__()
         self.setSharedRenderer(renderer)
         self.position = position
+
 
 class CardView(QGraphicsView):
     """ A View widget that represents the table area displaying a players cards. """

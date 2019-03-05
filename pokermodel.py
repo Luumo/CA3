@@ -19,6 +19,7 @@ class TexasHoldEm(QObject):
         self.pot = 0
         self.recent_bet = 0
         self.player_turn = 0
+        self.table = TableModel()
         self.deck = None
         self.next_round()
 
@@ -65,6 +66,10 @@ class TexasHoldEm(QObject):
         self.deck = StandardDeck()
         self.deck.shuffle_deck()
         self.pot = 0
+        # add cards to table
+        for _ in range(3):
+            self.table.add_card(self.deck.pop_card())
+        # add cards to player hand
         for player in self.players:
             player.hand.clear()
             for _ in range(2):
@@ -99,7 +104,6 @@ class Player(QObject):
         self.new_credits.emit()
 
 
-# You have made a class similar to this (hopefully):
 class CardModel(QObject):
     new_cards = pyqtSignal()
 
@@ -118,7 +122,7 @@ class CardModel(QObject):
 
 class TableModel(CardModel):
     def __init__(self):
-        super().__init__()
+        CardModel.__init__(self)
         self.cards = []
 
     def __iter__(self):
