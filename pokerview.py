@@ -98,7 +98,7 @@ class ControlView(QGroupBox):
         self.setLayout(hbox)
 
         game.new_pot.connect(self.update_pot)
-        self.update()
+        self.update_pot()
         game.next_player.connect(self.update_active_player)
         self.update_active_player()
 
