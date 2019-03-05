@@ -11,9 +11,7 @@ class TexasHoldEm(QObject):
 
     def __init__(self):
         super().__init__()
-        #init deck
-
-        # init players
+        # init players, deck, gameplay variables
         self.players = [Player("Janne"), Player("Fia")]
         # Data which will be changed while game is running
         self.pot = 0
@@ -25,7 +23,6 @@ class TexasHoldEm(QObject):
 
     def start(self):
         pass
-
 
     def active_player(self):
         # returns the active player
