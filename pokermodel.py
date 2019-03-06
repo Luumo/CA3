@@ -23,25 +23,60 @@ class TexasHoldEm(QObject):
         # how many player turns have been played
         self.turns_count = 0
 
+    def init_round(self):
+        self.reset_hand_table()
+        self.deck = StandardDeck()
+        self.deck.shuffle_deck()
+        # add cards to table
+        for _ in range(3):
+            self.table.add_card(self.deck.pop_card())
+            print(self.table.cards)
+        # add cards to player hand
+        for player in self.players:
+            player.hand.clear()
+            for _ in range(2):
+                player.hand.add_card(self.deck.pop_card())
+        self.players[self.player_turn].set_inplay(True)
+        self.next_player.emit()
+
+    def active_round(self):
+        if self.turns_count == 2 and len(self.table.cards) != 5:
+            self.table.add_card(self.deck.pop_card())
+            # resets turns_count when all players have made a move
+            self.turns_count = 0
+
+            self.announce_winner()
+
     def announce_winner(self):
         if len(self.table.cards) == 5:
             # Compare cards
             p1_poker_hand = self.players[0].hand.best_poker_hand(self.table.cards)
             p2_poker_hand = self.players[1].hand.best_poker_hand(self.table.cards)
 
-            if p1_poker_hand < p2_poker_hand:
-                self.winner.emit(self.players[0].name + " won!")
+            if p1_poker_hand > p2_poker_hand:
+                self.winner.emit(self.players[0].name + " won with {}!".format(p1_poker_hand.pokertype.name))
+                self.players[0].credits += self.pot
             else:
-                self.winner.emit(self.players[1].name + " won!")
+                self.winner.emit(self.players[1].name + " won with {}!".format(p2_poker_hand.pokertype.name))
+                self.players[1].credits += self.pot
 
-    def active_round(self):
-        if self.turns_count == 2 and len(self.table.cards) != 5:
-            self.table.add_card(self.deck.pop_card())
-            self.turns_count = 0
+            for player in self.players:
+                player.new_credits.emit()
 
+            for player in self.players:
+                if player.credits <= 0:
+                    self.winner.emit("{} Lost this Game. Game will close if you press OK".format(player.name))
+                    app.exit()
+                else:
+                    self.init_round()
 
-             # winner
-
+    def reset_hand_table(self):
+        self.deck = None
+        self.table.cards.clear()
+        for player in self.players:
+            self.pot = 0
+            self.new_pot.emit()
+            player.hand.clear()
 
     def active_player(self):
         # returns the active player
@@ -55,7 +90,6 @@ class TexasHoldEm(QObject):
         self.next_player.emit()
         self.turns_count += 1
         self.active_round()
-        self.announce_winner()
         # append card to table if both players have played, and cards not == 5
 
 
@@ -81,23 +115,6 @@ class TexasHoldEm(QObject):
         self.recent_bet = amount
         self.new_pot.emit()
         self.change_active_player()
-
-    def init_round(self):
-        #  wipe cards, deck, pot
-        self.deck = StandardDeck()
-        self.deck.shuffle_deck()
-        self.pot = 0
-        # add cards to table
-        for _ in range(3):
-            self.table.add_card(self.deck.pop_card())
-        # add cards to player hand
-        for player in self.players:
-            player.hand.clear()
-            for _ in range(2):
-                player.hand.add_card(self.deck.pop_card())
-        self.players[self.player_turn].set_inplay(True)
-        self.next_player.emit()
-
 
 
 class Player(QObject):
