@@ -19,10 +19,18 @@ class TexasHoldEm(QObject):
         self.player_turn = 0
         self.table = TableModel()
         self.deck = None
-        self.next_round()
+        self.init_round()
         # how many player turns have been played
         self.turns_count = 0
 
+    def active_game(self):
+        if self.turns_count == 2 and len(self.table.cards) != 5:
+            self.table.add_card(self.deck.pop_card())
+            self.turns_count = 0
+
+        if self.table.cards == 5:
+            # Compare cards
+            # winner
 
 
     def active_player(self):
@@ -34,8 +42,13 @@ class TexasHoldEm(QObject):
         self.players[self.player_turn].set_inplay(False)
         self.player_turn = (self.player_turn + 1) % len(self.players)
         self.players[self.player_turn].set_inplay(True)
-        self.turns_count += 1
         self.next_player.emit()
+        self.turns_count += 1
+        self.active_game()
+        # append card to table if both players have played, and cards not == 5
+
+
+
 
     def fold(self):
         # if active player folds, other player wins.
@@ -43,7 +56,6 @@ class TexasHoldEm(QObject):
             self.winner.emit(self.players[1].name + " won!")
         elif self.active_player() == self.players[1]:
             self.winner.emit(self.players[0].name + " won!")
-
 
     def check(self):
         # TODO: only allow check when noone have betted. else warn to do something else
@@ -61,7 +73,7 @@ class TexasHoldEm(QObject):
         self.new_pot.emit()
         self.change_active_player()
 
-    def next_round(self):
+    def init_round(self):
         #  wipe cards, deck, pot
         self.deck = StandardDeck()
         self.deck.shuffle_deck()
