@@ -25,7 +25,7 @@ class MainWindow(QGroupBox):
 
         self.setLayout(vbox)
 
-        self.setGeometry(500, 300, 1000, 500)
+        self.setGeometry(500, 500, 1200, 1000)
         self.setWindowTitle('Poker Game')
 
         # Model
