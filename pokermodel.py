@@ -98,6 +98,7 @@ class TexasHoldEm(QObject):
             self.winner.emit(self.players[1].name + " won!")
         elif self.active_player() == self.players[1]:
             self.winner.emit(self.players[0].name + " won!")
+        self.init_round()
 
     def check(self):
         # TODO: only allow check when noone have betted. else warn to do something else
