@@ -30,7 +30,6 @@ class TexasHoldEm(QObject):
         # add cards to table
         for _ in range(3):
             self.table.add_card(self.deck.pop_card())
-            print(self.table.cards)
         # add cards to player hand
         for player in self.players:
             player.hand.clear()
