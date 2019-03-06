@@ -23,14 +23,24 @@ class TexasHoldEm(QObject):
         # how many player turns have been played
         self.turns_count = 0
 
-    def active_game(self):
+    def announce_winner(self):
+        if len(self.table.cards) == 5:
+            # Compare cards
+            p1_poker_hand = self.players[0].hand.best_poker_hand(self.table.cards)
+            p2_poker_hand = self.players[1].hand.best_poker_hand(self.table.cards)
+
+            if p1_poker_hand < p2_poker_hand:
+                self.winner.emit(self.players[0].name + " won!")
+            else:
+                self.winner.emit(self.players[1].name + " won!")
+
+    def active_round(self):
         if self.turns_count == 2 and len(self.table.cards) != 5:
             self.table.add_card(self.deck.pop_card())
             self.turns_count = 0
 
-        if self.table.cards == 5:
-            # Compare cards
-            # winner
+
+             # winner
 
 
     def active_player(self):
@@ -44,10 +54,9 @@ class TexasHoldEm(QObject):
         self.players[self.player_turn].set_inplay(True)
         self.next_player.emit()
         self.turns_count += 1
-        self.active_game()
+        self.active_round()
+        self.announce_winner()
         # append card to table if both players have played, and cards not == 5
-
-
 
 
     def fold(self):

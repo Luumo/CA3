@@ -114,7 +114,7 @@ class PlayerView(QGroupBox):
 
         # arrange horizontally
         hbox = QHBoxLayout()
-        hbox.addStretch(1)
+        # hbox.addStretch(1)
         hbox.addLayout(vbox)
 
         self.setLayout(hbox)
@@ -135,12 +135,12 @@ class TableView(QGroupBox):
 
         # arrange horizontally
         hbox = QHBoxLayout()
-        hbox.addStretch(1)
+        # hbox.addStretch(1)
         hbox.addWidget(self.tableView)
 
         # arrange vertically
         vbox = QVBoxLayout()
-        vbox.addStretch(1)
+        #vbox.addStretch(1)
         vbox.addLayout(hbox)
 
         self.setLayout(vbox)
