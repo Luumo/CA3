@@ -27,6 +27,7 @@ class TexasHoldEm(QObject):
         self.pot = 0
         self.call_count = 0
         self.table.cards.clear()
+        self.table.new_cards.emit()
         self.deck = StandardDeck()
         self.deck.shuffle_deck()
         for player in self.players:
@@ -77,12 +78,12 @@ class TexasHoldEm(QObject):
             for player in self.players:
                 player.new_credits.emit()
 
-        for player in self.players:
-            if player.credits <= 0:
-                self.winner.emit("{} Lost this Game. Game will close if you press OK".format(player.name))
-                app.exit()
-            else:
-                self.init_round()
+            for player in self.players:
+                if player.credits <= 0:
+                    self.winner.emit("{} Lost this Game. Game will close if you press OK".format(player.name))
+                    app.exit()
+                else:
+                    self.init_round()
 
     def active_player(self):
         return self.players[self.player_turn]
@@ -105,7 +106,6 @@ class TexasHoldEm(QObject):
         self.init_round()
 
     def check(self):
-        # TODO: only allow check when noone have betted. else warn to do something else
         self.change_active_player()
         self.next_player.emit()
 
