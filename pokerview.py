@@ -1,30 +1,28 @@
 from PyQt5.QtGui import *
 from PyQt5.QtSvg import *
 from PyQt5.QtWidgets import *
-from pokermodel import *
+import cardlib
 
 
 class MainWindow(QGroupBox):
     def __init__(self, game):
         super().__init__("Main window")
 
-        # creates widgets
         cv = ControlView(game)
         pvs = [PlayerView(player) for player in game.players]
         tv = TableView(game)
 
-        # add horizontal widgets
         hbox = QHBoxLayout()
-        for pv in pvs: hbox.addWidget(pv)
+        for pv in pvs:
+            hbox.addWidget(pv)
         hbox.addWidget(cv)
-        # add vertical widgets
+
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         vbox.addWidget(tv)
         vbox.addLayout(hbox)
 
         self.setLayout(vbox)
-
         self.setGeometry(500, 500, 1200, 800)
         self.setWindowTitle('Poker Game')
 
@@ -43,13 +41,12 @@ class ControlView(QGroupBox):
         super().__init__("Control View")
         self.game = game
 
-        #widgets
         self.ActivePlayerLabel = QLabel()
 
         self.betButton = QPushButton("Bet")
         self.betAmount = QSpinBox()
         self.betAmount.setRange(0, 1000)
-        self.betButton.clicked.connect(self.bet_ammount)
+        self.betButton.clicked.connect(self.bet_amount)
 
         self.foldButton = QPushButton("Fold")
         self.foldButton.clicked.connect(game.fold)
@@ -62,10 +59,8 @@ class ControlView(QGroupBox):
 
         self.potLabel = QLabel()
 
-        # arrange widgets vertically
         vbox = QVBoxLayout()
         vbox.addStretch(1)
-        # add widgets
         vbox.addWidget(self.ActivePlayerLabel)
         vbox.addWidget(self.potLabel)
         vbox.addWidget(self.betAmount)
@@ -74,7 +69,6 @@ class ControlView(QGroupBox):
         vbox.addWidget(self.foldButton)
         vbox.addWidget(self.checkButton)
 
-        # Arrange horizontally
         hbox = QHBoxLayout()
         hbox.addStretch(1)
         hbox.addLayout(vbox)
@@ -94,7 +88,7 @@ class ControlView(QGroupBox):
         # update active player label
         self.ActivePlayerLabel.setText("Active Player: {}".format(self.game.active_player().name))
 
-    def bet_ammount(self):
+    def bet_amount(self):
         self.game.bet(int(self.betAmount.text()))
 
 
@@ -103,17 +97,14 @@ class PlayerView(QGroupBox):
         super().__init__("{}".format(player.name))
         self.player = player
 
-        # widgets
         self.creditLabel = QLabel()
         self.cardView = CardView(player.hand)
 
-        # arrange vertically
         vbox = QVBoxLayout()
         vbox.addStretch(1)
         vbox.addWidget(self.creditLabel)
         vbox.addWidget(self.cardView)
 
-        # arrange horizontally
         hbox = QHBoxLayout()
         # hbox.addStretch(1)
         hbox.addLayout(vbox)
@@ -131,17 +122,14 @@ class PlayerView(QGroupBox):
 class TableView(QGroupBox):
     def __init__(self, game):
         super().__init__("Table View")
-        # widgets
         self.tableView = CardView(game.table)
 
-        # arrange horizontally
         hbox = QHBoxLayout()
         # hbox.addStretch(1)
         hbox.addWidget(self.tableView)
 
-        # arrange vertically
         vbox = QVBoxLayout()
-        #vbox.addStretch(1)
+        # vbox.addStretch(1)
         vbox.addLayout(hbox)
 
         self.setLayout(vbox)
@@ -174,14 +162,13 @@ class CardItem(QGraphicsSvgItem):
 class CardView(QGraphicsView):
     """ A View widget that represents the table area displaying a players cards. """
 
-    # Underscores indicate a private function/method!
     def __read_cards(): # Ignore the PyCharm warning on this line. It's correct.
         """
         Reads all the 52 cards from files.
         :return: Dictionary of SVG renderers
         """
-        all_cards = dict() # Dictionaries let us have convenient mappings between cards and their images
-        for suit_file, suit in zip('SHDC', Suit): # Check the order of the suits here!!!
+        all_cards = dict() # mappings between cards and their images
+        for suit_file, suit in zip('SHDC', cardlib.Suit):
             for value_file, value in zip(['2', '3', '4', '5', '6',
                                           '7', '8', '9', '10', 'J', 'Q', 'K', 'A'], range(2, 15)):
                 file = value_file + suit_file
@@ -207,13 +194,7 @@ class CardView(QGraphicsView):
         self.model = cards_model
         self.card_spacing = card_spacing
         self.padding = padding
-
-        # Whenever the this window should update, it should call the "change_cards" method.
-        # This can, for example, be done by connecting it to a signal.
-        # The view can listen to changes:
         cards_model.new_cards.connect(self.change_cards)
-        # It is completely optional if you want to do it this way, or have some overreaching Player/GameState
-        # call the "change_cards" method instead. z
 
         # Add the cards the first time around to represent the initial state.
         self.change_cards()
@@ -255,6 +236,5 @@ class CardView(QGraphicsView):
         self.update_view()
         super().resizeEvent(painter)
 
-    # You can remove these events if you don't need them.
     def mouseDoubleClickEvent(self, event):
-        self.model.flip() # Another possible event. Lets add it to the flip functionality for fun!
+        self.model.flip()

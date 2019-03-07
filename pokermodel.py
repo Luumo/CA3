@@ -1,5 +1,7 @@
+import sys
 from PyQt5.QtCore import *
 from cardlib import *
+from pokerview import *
 
 
 class TexasHoldEm(QObject):
@@ -11,14 +13,12 @@ class TexasHoldEm(QObject):
         super().__init__()
         # init players, deck, gameplay variables
         self.players = [Player("Janne"), Player("Fia")]
-        # Data which will be changed while game is running
         self.pot = 0
         self.recent_bet = 0
         self.player_turn = 0
         self.table = TableModel()
         self.deck = None
         self.init_round()
-        # self.turns_count = 0
         self.call_count = 0
 
     def _reset(self):
@@ -42,7 +42,7 @@ class TexasHoldEm(QObject):
         self.next_player.emit()
 
     def active_round(self):
-        print(self.call_count)
+        # print(self.call_count)
         if self.call_count == 2:
             self.call_count = 0
             if len(self.table.cards) == 0:
@@ -51,8 +51,6 @@ class TexasHoldEm(QObject):
             elif len(self.table.cards) < 5:
                 self.table.add_card(self.deck.pop_card())
             else:
-                #print(','.join([str(c) for c in self.table.cards]))
-                # resets turns_count when all players have made a move
                 self.announce_winner()
 
     def announce_winner(self):
@@ -60,10 +58,6 @@ class TexasHoldEm(QObject):
             # Compare cards
             p1_poker_hand = self.players[0].hand.best_poker_hand(self.table.cards)
             p2_poker_hand = self.players[1].hand.best_poker_hand(self.table.cards)
-
-            # print(self.table.cards)
-            # for player in self.players:
-            #     print(','.join([str(c) for c in player.hand.cards]))
 
             if p1_poker_hand > p2_poker_hand:
                 self.winner.emit(self.players[0].name + " won with {}!".format(p1_poker_hand.pokertype.name))
@@ -87,7 +81,6 @@ class TexasHoldEm(QObject):
         return self.players[self.player_turn]
 
     def change_active_player(self):
-        # Changes active player
         self.players[self.player_turn].set_inplay(False)
         self.player_turn = (self.player_turn + 1) % len(self.players)
         self.players[self.player_turn].set_inplay(True)
@@ -104,13 +97,14 @@ class TexasHoldEm(QObject):
 
     def check(self):
         # disabled function
-        pass
         # self.change_active_player()
         # self.next_player.emit()
+        pass
+
 
     def call(self):
         self.call_count += 1
-        # pay same ammount of credits as recent player, and keep playing
+        # pay same amount of credits as recent player, and keep playing
         amount = self.recent_bet
         self.active_player().bet(amount)
         self.pot += amount
@@ -192,7 +186,7 @@ class HandModel(Hand, CardModel):
     def __init__(self):
         Hand.__init__(self)
         CardModel.__init__(self)
-        # Additional state needed by the UI, keeping track of the selected cards:
+        # Additional state needed by the UI, keeping track of the selected cards
         self.flipped_cards = True
 
     def __iter__(self):
@@ -205,7 +199,6 @@ class HandModel(Hand, CardModel):
 
     def flipped(self, i):
         # This model only flips all or no cards, so we don't care about the index.
-        # Might be different for other games though!
         return self.flipped_cards
 
     def add_card(self, card):
@@ -215,3 +208,9 @@ class HandModel(Hand, CardModel):
     def clear(self):
         self.cards = []
         self.new_cards.emit()
+
+
+app = QApplication(sys.argv)
+win = MainWindow(TexasHoldEm())
+win.show()
+app.exec_()
