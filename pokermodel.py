@@ -20,16 +20,21 @@ class TexasHoldEm(QObject):
         self.table = TableModel()
         self.deck = None
         self.init_round()
-        # how many player turns have been played
-        self.turns_count = 0
+        # self.turns_count = 0
+        self.call_count = 0
 
-    def init_round(self):
-        self.reset_hand_table()
+    def _reset(self):
+        self.pot = 0
+        self.call_count = 0
+        self.table.cards.clear()
         self.deck = StandardDeck()
         self.deck.shuffle_deck()
-        # add cards to table
-        for _ in range(3):
-            self.table.add_card(self.deck.pop_card())
+        for player in self.players:
+            self.new_pot.emit()
+            player.hand.clear()
+
+    def init_round(self):
+        self._reset()
         # add cards to player hand
         for player in self.players:
             player.hand.clear()
@@ -39,18 +44,28 @@ class TexasHoldEm(QObject):
         self.next_player.emit()
 
     def active_round(self):
-        if self.turns_count == 2 and len(self.table.cards) != 5:
-            self.table.add_card(self.deck.pop_card())
-            # resets turns_count when all players have made a move
-            self.turns_count = 0
-
-            self.announce_winner()
+        print(self.call_count)
+        if self.call_count == 2:
+            self.call_count = 0
+            if len(self.table.cards) == 0:
+                for _ in range(3):
+                    self.table.add_card(self.deck.pop_card())
+            elif len(self.table.cards) < 5:
+                self.table.add_card(self.deck.pop_card())
+            else:
+                #print(','.join([str(c) for c in self.table.cards]))
+                # resets turns_count when all players have made a move
+                self.announce_winner()
 
     def announce_winner(self):
         if len(self.table.cards) == 5:
             # Compare cards
             p1_poker_hand = self.players[0].hand.best_poker_hand(self.table.cards)
             p2_poker_hand = self.players[1].hand.best_poker_hand(self.table.cards)
+
+            # print(self.table.cards)
+            # for player in self.players:
+            #     print(','.join([str(c) for c in player.hand.cards]))
 
             if p1_poker_hand > p2_poker_hand:
                 self.winner.emit(self.players[0].name + " won with {}!".format(p1_poker_hand.pokertype.name))
@@ -62,23 +77,14 @@ class TexasHoldEm(QObject):
             for player in self.players:
                 player.new_credits.emit()
 
-            for player in self.players:
-                if player.credits <= 0:
-                    self.winner.emit("{} Lost this Game. Game will close if you press OK".format(player.name))
-                    app.exit()
-                else:
-                    self.init_round()
-
-    def reset_hand_table(self):
-        self.deck = None
-        self.table.cards.clear()
         for player in self.players:
-            self.pot = 0
-            self.new_pot.emit()
-            player.hand.clear()
+            if player.credits <= 0:
+                self.winner.emit("{} Lost this Game. Game will close if you press OK".format(player.name))
+                app.exit()
+            else:
+                self.init_round()
 
     def active_player(self):
-        # returns the active player
         return self.players[self.player_turn]
 
     def change_active_player(self):
@@ -87,10 +93,8 @@ class TexasHoldEm(QObject):
         self.player_turn = (self.player_turn + 1) % len(self.players)
         self.players[self.player_turn].set_inplay(True)
         self.next_player.emit()
-        self.turns_count += 1
+        # self.turns_count += 1
         self.active_round()
-        # append card to table if both players have played, and cards not == 5
-
 
     def fold(self):
         # if active player folds, other player wins.
@@ -106,10 +110,17 @@ class TexasHoldEm(QObject):
         self.next_player.emit()
 
     def call(self):
+        self.call_count += 1
         # pay same ammount of credits as recent player, and keep playing
-        self.bet(self.recent_bet)
+        amount = self.recent_bet
+        self.active_player().bet(amount)
+        self.pot += amount
+        self.recent_bet = amount
+        self.new_pot.emit()
+        self.change_active_player()
 
     def bet(self, amount: int):
+        self.call_count = 0
         self.active_player().bet(amount)
         self.pot += amount
         self.recent_bet = amount

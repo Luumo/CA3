@@ -47,7 +47,7 @@ class ControlView(QGroupBox):
         self.ActivePlayerLabel = QLabel()
 
         self.betButton = QPushButton("Bet")
-        self.betAmmount = QLineEdit()
+        self.betAmount = QLineEdit()
         self.betButton.clicked.connect(self.bet_ammount)
 
         self.foldButton = QPushButton("Fold")
@@ -67,7 +67,7 @@ class ControlView(QGroupBox):
         # add widgets
         vbox.addWidget(self.ActivePlayerLabel)
         vbox.addWidget(self.potLabel)
-        vbox.addWidget(self.betAmmount)
+        vbox.addWidget(self.betAmount)
         vbox.addWidget(self.betButton)
         vbox.addWidget(self.callButton)
         vbox.addWidget(self.foldButton)
@@ -94,7 +94,7 @@ class ControlView(QGroupBox):
         self.ActivePlayerLabel.setText("Active Player: {}".format(self.game.active_player().name))
 
     def bet_ammount(self):
-        self.game.bet(int(self.betAmmount.text()))
+        self.game.bet(int(self.betAmount.text()))
 
 
 class PlayerView(QGroupBox):
