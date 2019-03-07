@@ -1,7 +1,5 @@
 from PyQt5.QtCore import *
 from cardlib import *
-from pokerview import *
-import sys
 
 
 class TexasHoldEm(QObject):
@@ -80,6 +78,7 @@ class TexasHoldEm(QObject):
             for player in self.players:
                 if player.credits <= 0:
                     self.winner.emit("{} Lost this Game. Game will close if you press OK".format(player.name))
+                    # TODO: ??
                     app.exit()
                 else:
                     self.init_round()
@@ -216,9 +215,3 @@ class HandModel(Hand, CardModel):
     def clear(self):
         self.cards = []
         self.new_cards.emit()
-
-# pokergame.py
-app = QApplication(sys.argv)
-win = MainWindow(TexasHoldEm())
-win.show()
-app.exec_()

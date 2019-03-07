@@ -1,7 +1,7 @@
 from PyQt5.QtGui import *
 from PyQt5.QtSvg import *
 from PyQt5.QtWidgets import *
-import cardlib
+from pokermodel import *
 
 
 class MainWindow(QGroupBox):
@@ -48,6 +48,7 @@ class ControlView(QGroupBox):
 
         self.betButton = QPushButton("Bet")
         self.betAmount = QSpinBox()
+        self.betAmount.setRange(0, 1000)
         self.betButton.clicked.connect(self.bet_ammount)
 
         self.foldButton = QPushButton("Fold")
@@ -180,7 +181,7 @@ class CardView(QGraphicsView):
         :return: Dictionary of SVG renderers
         """
         all_cards = dict() # Dictionaries let us have convenient mappings between cards and their images
-        for suit_file, suit in zip('SHDC', cardlib.Suit): # Check the order of the suits here!!!
+        for suit_file, suit in zip('SHDC', Suit): # Check the order of the suits here!!!
             for value_file, value in zip(['2', '3', '4', '5', '6',
                                           '7', '8', '9', '10', 'J', 'Q', 'K', 'A'], range(2, 15)):
                 file = value_file + suit_file
