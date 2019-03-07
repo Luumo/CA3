@@ -47,7 +47,7 @@ class ControlView(QGroupBox):
         self.ActivePlayerLabel = QLabel()
 
         self.betButton = QPushButton("Bet")
-        self.betAmount = QLineEdit()
+        self.betAmount = QSpinBox()
         self.betButton.clicked.connect(self.bet_ammount)
 
         self.foldButton = QPushButton("Fold")
@@ -56,7 +56,7 @@ class ControlView(QGroupBox):
         self.callButton = QPushButton("Call")
         self.callButton.clicked.connect(game.call)
 
-        self.checkButton = QPushButton("Check")
+        self.checkButton = QPushButton("Check (Disabled)")
         self.checkButton.clicked.connect(game.check)
 
         self.potLabel = QLabel()

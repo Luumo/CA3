@@ -26,8 +26,7 @@ class TexasHoldEm(QObject):
     def _reset(self):
         self.pot = 0
         self.call_count = 0
-        self.table.cards.clear()
-        self.table.new_cards.emit()
+        self.table.clear()
         self.deck = StandardDeck()
         self.deck.shuffle_deck()
         for player in self.players:
@@ -94,7 +93,6 @@ class TexasHoldEm(QObject):
         self.player_turn = (self.player_turn + 1) % len(self.players)
         self.players[self.player_turn].set_inplay(True)
         self.next_player.emit()
-        # self.turns_count += 1
         self.active_round()
 
     def fold(self):
@@ -106,8 +104,10 @@ class TexasHoldEm(QObject):
         self.init_round()
 
     def check(self):
-        self.change_active_player()
-        self.next_player.emit()
+        # disabled function
+        pass
+        # self.change_active_player()
+        # self.next_player.emit()
 
     def call(self):
         self.call_count += 1
