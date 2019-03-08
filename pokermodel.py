@@ -8,6 +8,7 @@ class TexasHoldEm(QObject):
     new_pot = pyqtSignal()
     next_player = pyqtSignal()
     winner = pyqtSignal(str,)
+    game_ended = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -72,8 +73,7 @@ class TexasHoldEm(QObject):
             for player in self.players:
                 if player.credits <= 0:
                     self.winner.emit("{} Lost this Game. Game will close if you press OK".format(player.name))
-                    # TODO: ??
-                    app.exit()
+                    self.game_ended.emit()
                 else:
                     self.init_round()
 
@@ -93,14 +93,12 @@ class TexasHoldEm(QObject):
             self.winner.emit(self.players[1].name + " won!")
         elif self.active_player() == self.players[1]:
             self.winner.emit(self.players[0].name + " won!")
-        self.init_round()
 
     def check(self):
         # disabled function
         # self.change_active_player()
         # self.next_player.emit()
         pass
-
 
     def call(self):
         self.call_count += 1
@@ -208,10 +206,3 @@ class HandModel(Hand, CardModel):
     def clear(self):
         self.cards = []
         self.new_cards.emit()
-
-"""
-app = QApplication(sys.argv)
-win = MainWindow(TexasHoldEm())
-win.show()
-app.exec_()
-"""

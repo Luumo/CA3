@@ -29,6 +29,7 @@ class MainWindow(QGroupBox):
         # Model
         self.game = game
         game.winner.connect(self.alert_winner)
+        game.game_ended.connect(self.close)
 
     def alert_winner(self, text):
         msg = QMessageBox()
@@ -54,7 +55,8 @@ class ControlView(QGroupBox):
         self.callButton = QPushButton("Call")
         self.callButton.clicked.connect(game.call)
 
-        self.checkButton = QPushButton("Check (Disabled)")
+        self.checkButton = QPushButton("Check")
+        self.checkButton.setEnabled(False)
         self.checkButton.clicked.connect(game.check)
 
         self.potLabel = QLabel()
