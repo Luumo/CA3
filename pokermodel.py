@@ -1,7 +1,5 @@
-# import sys
 from PyQt5.QtCore import *
 from cardlib import *
-# from pokerview import *
 
 
 class TexasHoldEm(QObject):
