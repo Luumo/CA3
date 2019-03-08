@@ -1,7 +1,7 @@
-import sys
+# import sys
 from PyQt5.QtCore import *
 from cardlib import *
-from pokerview import *
+# from pokerview import *
 
 
 class TexasHoldEm(QObject):
@@ -209,8 +209,9 @@ class HandModel(Hand, CardModel):
         self.cards = []
         self.new_cards.emit()
 
-
+"""
 app = QApplication(sys.argv)
 win = MainWindow(TexasHoldEm())
 win.show()
 app.exec_()
+"""

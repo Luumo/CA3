@@ -1,5 +1,6 @@
 import sys
 from pokermodel import *
+from pokerview import *
 
 
 def main():
