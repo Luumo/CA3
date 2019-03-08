@@ -94,9 +94,8 @@ class TexasHoldEm(QObject):
 
     def check(self):
         # disabled function
-        # self.change_active_player()
-        # self.next_player.emit()
-        pass
+        self.change_active_player()
+        self.next_player.emit()
 
     def call(self):
         self.call_count += 1
